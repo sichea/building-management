@@ -2401,4 +2401,26 @@ body {
   .modal-footer {
     padding: 12px !important;
   }
+
+  /* ----------------------------------------------------
+     건물 탭바 모바일 줄바꿈 방지 및 가로 스크롤 강제
+     ---------------------------------------------------- */
+  .building-tabs-container {
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+  }
+  
+  .building-tabs {
+    min-width: 0 !important; /* flexbox 내에서 가로 스크롤 작동 보장 */
+    flex-grow: 1 !important;
+    overflow-x: auto !important;
+    display: flex !important;
+    gap: 8px !important;
+  }
+  
+  .building-tabs-actions {
+    flex-shrink: 0 !important; /* 추가/삭제 버튼이 찌그러지거나 아래로 밀리지 않도록 고정 */
+    display: flex !important;
+    gap: 4px !important;
+  }
 }
