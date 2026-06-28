@@ -2153,4 +2153,14 @@ body {
     gap: 8px;
     margin-bottom: 24px;
   }
+  
+  /* 모바일 가로 찌그러짐 및 왼쪽 잘림(층 표기 등) 완벽 해결 */
+  .building-3d {
+    min-width: 680px !important;
+    margin: 0 !important; /* 왼쪽 잘림 방지 및 정렬 맞춤 */
+  }
+  
+  .building-3d.all-buildings-layout {
+    justify-content: flex-start !important; /* 전체보기 탭에서도 왼쪽 잘림 방지 */
+  }
 }
