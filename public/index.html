@@ -6,7 +6,7 @@
   <title>스마트 건물 협업 관리 시스템</title>
   <!-- Pretendard 글꼴 로드 -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=1.0.3">
   <!-- Lucide Icons (심플 아이콘) 로드 -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -226,7 +226,7 @@
               </div>
               <div class="form-group">
                 <label>계약 기간</label>
-                <div style="display: flex; gap: 8px; align-items: center;">
+                <div class="date-range-container" style="display: flex; gap: 8px; align-items: center;">
                   <input type="date" id="leaseStart" style="flex: 1; padding: 10px 16px; border: 1px solid #cbd5e1; border-radius: var(--border-radius-sm); font-size: 14px; outline: none; background: var(--bg-card); color: var(--text-main);">
                   <span style="color: var(--text-muted); font-weight: 700;">~</span>
                   <input type="date" id="leaseEnd" style="flex: 1; padding: 10px 16px; border: 1px solid #cbd5e1; border-radius: var(--border-radius-sm); font-size: 14px; outline: none; background: var(--bg-card); color: var(--text-main);">
@@ -355,6 +355,6 @@
     </div>
   </div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=1.0.3"></script>
 </body>
 </html>
