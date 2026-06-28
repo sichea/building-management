@@ -261,7 +261,7 @@ function renderDashboard() {
           const rt = room.roomType || 'oneroom';
           const size = room.slotSize || (rt === 'full' ? 5 : (rt === 'tworoom' || rt === 'store2') ? 2 : 1);
           const roomEl = createRoom3DElement(room, building.id);
-          roomEl.style.flex = `${size} 0 0%`; // Flex 비율 설정으로 여백 없이 꽉 채움
+          roomEl.style.flex = `${size} 1 0%`; // Flex 비율 설정으로 여백 없이 꽉 채우며 수축 허용
           floorRoomsContainer.appendChild(roomEl);
         });
         
@@ -345,7 +345,7 @@ function renderDashboard() {
       const rt = room.roomType || 'oneroom';
       const size = room.slotSize || (rt === 'full' ? 5 : (rt === 'tworoom' || rt === 'store2') ? 2 : 1);
       const roomEl = createRoom3DElement(room, activeBuilding.id);
-      roomEl.style.flex = `${size} 0 0%`; // Flex 비율 설정으로 여백 없이 꽉 채움
+      roomEl.style.flex = `${size} 1 0%`; // Flex 비율 설정으로 여백 없이 꽉 채우며 수축 허용
       floorRoomsContainer.appendChild(roomEl);
     });
     

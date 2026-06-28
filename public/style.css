@@ -501,6 +501,7 @@ body {
   gap: 0;
   flex-grow: 1;
   width: 100%;
+  min-width: 0; /* 내부 요소 수축 허용 */
 }
 
 /* ====================================================
@@ -517,6 +518,7 @@ body {
   transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   background: #ffffff;
+  min-width: 0; /* flex-shrink 수축 작동 보장 */
 }
 
 .room-3d:last-child {
