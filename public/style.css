@@ -2301,7 +2301,7 @@ body {
   }
   
   .modal-body {
-    padding: 16px !important;
+    padding: 12px !important; /* 패딩을 더 축소하여 공간 확보 */
     flex-direction: column !important; /* 좌우 배치를 상하 배치로 전환 */
     overflow-x: hidden !important;
   }
@@ -2321,6 +2321,26 @@ body {
     margin-top: 12px !important;
   }
 
+  /* 모달 세부 섹션 여백 축소 */
+  .info-section {
+    padding: 12px !important; /* 내부 패딩 축소 */
+  }
+
+  /* 이미지 업로드 영역 세로 배치 및 축소 */
+  .upload-input-group {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+  
+  .upload-input-group input {
+    width: 100% !important;
+    min-width: 0 !important; /* 수축 방지 제거 */
+  }
+  
+  .upload-input-group button {
+    width: 100% !important;
+  }
+
   /* 계약 기간 인풋 모바일 세로 배치 */
   .date-range-container {
     flex-direction: column !important;
@@ -2333,10 +2353,16 @@ body {
     color: var(--text-muted);
   }
 
-  /* 설비 이력 등록 폼 세로 정렬 */
+  /* 설비 이력 등록 폼 세로 정렬 및 인풋 수축 보장 */
   .ac-form-inputs {
     grid-template-columns: 1fr !important;
     gap: 6px !important;
+  }
+  
+  .ac-form-inputs input,
+  .ac-form-inputs select {
+    width: 100% !important;
+    min-width: 0 !important;
   }
   
   .ac-form-desc {
@@ -2344,7 +2370,17 @@ body {
     gap: 6px !important;
   }
   
+  .ac-form-desc input {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  
   .ac-form-desc button {
     width: 100% !important;
+  }
+
+  /* 모달 푸터 패딩 축소 */
+  .modal-footer {
+    padding: 12px !important;
   }
 }
