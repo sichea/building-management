@@ -2311,12 +2311,12 @@ body {
     gap: 8px !important;
   }
   
-  /* 모달 창 가로 폭 양 옆 마진 확보 */
+  /* 모달 창 가로 폭 양 옆 마진 확보 및 높이 축소로 하단 버튼 노출 */
   .modal-container {
     width: 95% !important;
     max-width: 95% !important;
     margin: 8px !important;
-    max-height: 94vh !important;
+    max-height: 82vh !important;
   }
   
   .modal-body {

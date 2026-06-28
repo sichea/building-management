@@ -83,6 +83,7 @@ function openModal(modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
     modal.classList.add('active');
+    document.body.style.overflow = 'hidden'; // 모달 오픈 시 본문 스크롤 차단
     if (modalId === 'roomDetailModal') {
       state.isModalOpen = true;
     }
@@ -93,6 +94,11 @@ function closeModal(modalId) {
   const modal = document.getElementById(modalId);
   if (modal) {
     modal.classList.remove('active');
+    // 활성화된 모든 모달이 닫혔는지 확인 후 본문 스크롤 복구
+    const activeModals = document.querySelectorAll('.modal-overlay.active');
+    if (activeModals.length === 0) {
+      document.body.style.overflow = '';
+    }
     if (modalId === 'roomDetailModal') {
       state.isModalOpen = false;
       state.selectedRoomId = null;
