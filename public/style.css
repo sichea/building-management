@@ -2136,10 +2136,10 @@ body {
   }
 }
 
-/* 모바일 화면 최적화 */
+/* 모바일 화면 최적화 (한 화면에 다 나오도록 스크롤 제거 및 크기 축소) */
 @media (max-width: 768px) {
   .app-container {
-    padding: 0 12px;
+    padding: 0 8px;
   }
   .main-header {
     padding: 16px 0;
@@ -2154,13 +2154,125 @@ body {
     margin-bottom: 24px;
   }
   
-  /* 모바일 가로 찌그러짐 및 왼쪽 잘림(층 표기 등) 완벽 해결 */
+  /* 모바일 한 화면 맞춤형 건물 레이아웃 */
   .building-3d {
-    min-width: 680px !important;
-    margin: 0 !important; /* 왼쪽 잘림 방지 및 정렬 맞춤 */
+    min-width: 100% !important;
+    margin: 0 auto !important;
+  }
+  
+  .building-unit {
+    min-width: 100% !important;
   }
   
   .building-3d.all-buildings-layout {
-    justify-content: flex-start !important; /* 전체보기 탭에서도 왼쪽 잘림 방지 */
+    justify-content: center !important;
+  }
+
+  .building-3d.all-buildings-layout .building-unit-container {
+    min-width: 100% !important;
+  }
+
+  /* 호실 카드 압축 */
+  .room-3d {
+    padding: 6px 4px !important;
+    height: 105px !important;
+  }
+  
+  .room-3d.room-empty-slot,
+  .room-3d.room-empty-cell {
+    height: 105px !important;
+  }
+
+  /* 텍스트 크기 축소 및 배치 최적화 */
+  .room-number {
+    font-size: 11px !important;
+    font-weight: 800 !important;
+  }
+  
+  .room-badge-status {
+    display: none !important; /* 배경색으로 구분되므로 숨김 */
+  }
+
+  /* 도어 및 창문 비주얼 크기 축소 */
+  .room-visual {
+    height: 20px !important;
+    margin-bottom: 2px !important;
+    gap: 2px !important;
+  }
+  
+  .room-door {
+    width: 11px !important;
+    height: 18px !important;
+    border-width: 1px !important;
+  }
+  
+  .room-window {
+    width: 12px !important;
+    height: 12px !important;
+    border-width: 1px !important;
+  }
+  
+  .room-window::before,
+  .room-window::after {
+    display: none !important; /* 창틀 십자선은 작아서 숨김 */
+  }
+
+  /* 구조 이모지 크기 및 넘침 방지 */
+  .room-visual.room-structure-emoji {
+    height: auto !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  
+  .room-visual.room-structure-emoji span {
+    font-size: 10px !important;
+    letter-spacing: -1px;
+  }
+
+  /* 세입자 정보 축소 */
+  .tenant-name {
+    font-size: 10px !important;
+  }
+  
+  .tenant-contact {
+    display: none !important; /* 모달에서 확인 가능하므로 숨김 */
+  }
+  
+  .empty-room-text {
+    font-size: 9px !important;
+  }
+
+  /* 임대 계약 정보 뱃지 */
+  .lease-badge {
+    font-size: 8px !important;
+    padding: 1px 3px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    display: inline-block;
+  }
+  
+  /* 아이콘 개수 푸터 숨김 */
+  .room-3d-footer {
+    display: none !important;
+  }
+  
+  /* 층 표시 라벨 폭 축소 */
+  .floor-label {
+    min-width: 36px !important;
+    font-size: 12px !important;
+  }
+  
+  .btn-floor-add-room {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  
+  .btn-floor-add-room i {
+    width: 10px !important;
+    height: 10px !important;
   }
 }
