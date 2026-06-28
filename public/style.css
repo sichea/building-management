@@ -2151,9 +2151,37 @@ body {
     font-size: 20px;
   }
   .stats-grid {
-    grid-template-columns: 1fr;
-    gap: 8px;
-    margin-bottom: 24px;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 6px !important;
+    margin-bottom: 16px !important;
+  }
+  
+  .stat-card {
+    padding: 10px 8px !important;
+    gap: 8px !important;
+    border-radius: var(--border-radius-sm) !important;
+    align-items: center !important;
+  }
+  
+  .stat-icon {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 6px !important;
+  }
+  
+  .stat-icon i {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  
+  .stat-label {
+    font-size: 10px !important;
+  }
+  
+  .stat-value {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
   }
   
   /* 모바일 한 화면 맞춤형 건물 레이아웃 */
