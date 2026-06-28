@@ -2302,6 +2302,23 @@ body {
   
   .modal-body {
     padding: 16px !important;
+    flex-direction: column !important; /* 좌우 배치를 상하 배치로 전환 */
+    overflow-x: hidden !important;
+  }
+  
+  .modal-left-pane,
+  .modal-right-pane {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: none !important;
+  }
+  
+  .modal-right-pane {
+    border-left: none !important;
+    padding-left: 0 !important;
+    border-top: 1px solid #e2e8f0 !important;
+    padding-top: 20px !important;
+    margin-top: 12px !important;
   }
 
   /* 계약 기간 인풋 모바일 세로 배치 */
