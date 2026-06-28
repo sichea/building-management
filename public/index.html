@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>스마트 건물 협업 관리 시스템</title>
+  <!-- Pretendard 글꼴 로드 -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+  <link rel="stylesheet" href="style.css">
+  <!-- Lucide Icons (심플 아이콘) 로드 -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="app-container">
+    <!-- 헤더 영역 -->
+    <header class="main-header">
+      <div class="header-logo">
+        <i data-lucide="building-2" class="logo-icon"></i>
+        <h1>스마트 건물 협업 관리</h1>
+      </div>
+      
+
+    </header>
+
+    <!-- 대시보드 컨트롤 및 통계 -->
+    <main class="main-content">
+        <!-- 전체 호실 상태 현황판 -->
+        <div class="stats-grid">
+          <div class="stat-card total">
+            <div class="stat-info">
+              <span class="stat-label">전체 호실</span>
+              <span class="stat-value" id="statTotal">0</span>
+            </div>
+            <div class="stat-icon-wrapper"><i data-lucide="home"></i></div>
+          </div>
+          <div class="stat-card occupied">
+            <div class="stat-info">
+              <span class="stat-label">입주</span>
+              <span class="stat-value" id="statOccupied">0</span>
+            </div>
+            <div class="stat-icon-wrapper"><i data-lucide="user-check"></i></div>
+          </div>
+          <div class="stat-card vacant">
+            <div class="stat-info">
+              <span class="stat-label">공실</span>
+              <span class="stat-value" id="statVacant">0</span>
+            </div>
+            <div class="stat-icon-wrapper"><i data-lucide="door-open"></i></div>
+          </div>
+        </div>
+
+      <!-- 3D 건물 뷰 -->
+      <section class="rooms-section">
+        <div class="section-header">
+          <h2>🏢 건물 호실 현황</h2>
+        </div>
+        
+        <!-- 건물 선택 탭 바 및 액션 컨테이너 -->
+        <div class="building-tabs-container">
+          <div class="building-tabs" id="buildingTabs"></div>
+          <div class="building-tabs-actions">
+            <button class="btn btn-secondary btn-sm" onclick="openModal('addBuildingModal')" title="건물 추가">
+              <i data-lucide="plus"></i>
+            </button>
+            <button class="btn btn-danger-outline btn-sm" id="deleteActiveBuildingBtn" title="건물 삭제">
+              <i data-lucide="trash-2"></i>
+            </button>
+          </div>
+        </div>
+        
+        <div class="building-3d-wrapper">
+          <div class="building-3d" id="building3D">
+            <!-- JS에서 층별로 동적 생성 -->
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="main-footer">
+      <p>© 2026 스마트 건물 협업 관리 시스템. 누구나 같은 와이파이에서 실시간으로 접속하여 함께 현황을 관리할 수 있습니다.</p>
+    </footer>
+  </div>
+
+  <!-- 건물 추가 모달 -->
+  <div class="modal-overlay" id="addBuildingModal">
+    <div class="modal-container modal-small">
+      <div class="modal-header">
+        <h3>새 건물 추가</h3>
+        <button class="modal-close" onclick="closeModal('addBuildingModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="newBuildingName">건물명</label>
+          <input type="text" id="newBuildingName" placeholder="예: 참존빌딩 A동, 우성빌라 B동" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('addBuildingModal')">취소</button>
+        <button class="btn btn-primary" id="saveBuildingBtn">추가하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 호실 추가 모달 -->
+  <div class="modal-overlay" id="addRoomModal">
+    <div class="modal-container modal-small">
+      <div class="modal-header">
+        <h3>새 호실 추가</h3>
+        <button class="modal-close" onclick="closeModal('addRoomModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="newRoomFloor">층 선택</label>
+          <div class="select-wrapper">
+            <select id="newRoomFloor">
+              <option value="1">1층</option>
+              <option value="2">2층</option>
+              <option value="3">3층</option>
+            </select>
+            <i data-lucide="chevron-down" class="select-arrow"></i>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="newRoomType">방 타입</label>
+          <div class="select-wrapper">
+            <select id="newRoomType">
+              <option value="oneroom">원룸</option>
+              <option value="tworoom">투룸</option>
+              <option value="store">상가</option>
+              <option value="full">전체</option>
+            </select>
+            <i data-lucide="chevron-down" class="select-arrow"></i>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="newRoomSlotSize">호실 크기 (슬롯 수)</label>
+          <div class="select-wrapper">
+            <select id="newRoomSlotSize">
+              <option value="1">1칸 (기본)</option>
+              <option value="2">2칸</option>
+              <option value="3">3칸</option>
+              <option value="4">4칸</option>
+              <option value="5">5칸 (전체)</option>
+            </select>
+            <i data-lucide="chevron-down" class="select-arrow"></i>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="newRoomNumber">호실 번호 / 이름</label>
+          <input type="text" id="newRoomNumber" placeholder="예: 103호" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('addRoomModal')">취소</button>
+        <button class="btn btn-primary" id="saveRoomBtn">추가하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 호실 상세 정보 관리 모달 -->
+  <div class="modal-overlay" id="roomDetailModal">
+    <div class="modal-container modal-large">
+      <div class="modal-header">
+        <div class="room-title-area">
+          <span class="room-badge" id="modalRoomBadge">101호</span>
+          <h2 id="modalRoomTitle">상세 관리</h2>
+        </div>
+        <button class="modal-close" id="modalCloseBtn">&times;</button>
+      </div>
+      <div class="modal-body grid-2-col">
+        <!-- 왼쪽 열: 호실 기본 정보 및 세입자 정보 -->
+        <div class="modal-left-pane">
+          <section class="info-section">
+            <h3 class="pane-title"><i data-lucide="info"></i> 기본 정보</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="roomStatus">호실 상태</label>
+                <div class="select-wrapper">
+                  <select id="roomStatus">
+                    <option value="occupied">입주</option>
+                    <option value="vacant">공실</option>
+                  </select>
+                  <i data-lucide="chevron-down" class="select-arrow"></i>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="roomNumberInput">호실 번호 수정</label>
+                <input type="text" id="roomNumberInput">
+              </div>
+              <div class="form-group">
+                <label for="detailRoomType">방 타입 설정</label>
+                <div class="select-wrapper">
+                  <select id="detailRoomType">
+                    <option value="oneroom">원룸</option>
+                    <option value="tworoom">투룸</option>
+                    <option value="store">상가</option>
+                    <option value="full">전체</option>
+                  </select>
+                  <i data-lucide="chevron-down" class="select-arrow"></i>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="detailRoomSlotSize">호실 크기 (슬롯 수)</label>
+                <div class="select-wrapper">
+                  <select id="detailRoomSlotSize">
+                    <option value="1">1칸</option>
+                    <option value="2">2칸</option>
+                    <option value="3">3칸</option>
+                    <option value="4">4칸</option>
+                    <option value="5">5칸 (전체)</option>
+                  </select>
+                  <i data-lucide="chevron-down" class="select-arrow"></i>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="leaseType">임대 유형</label>
+                <div class="select-wrapper">
+                  <select id="leaseType">
+                    <option value="">미선택</option>
+                    <option value="jeonse">전세</option>
+                    <option value="wolse">월세</option>
+                    <option value="banjeonse">반전세</option>
+                  </select>
+                  <i data-lucide="chevron-down" class="select-arrow"></i>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>계약 기간</label>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                  <input type="date" id="leaseStart" style="flex: 1; padding: 10px 16px; border: 1px solid #cbd5e1; border-radius: var(--border-radius-sm); font-size: 14px; outline: none; background: var(--bg-card); color: var(--text-main);">
+                  <span style="color: var(--text-muted); font-weight: 700;">~</span>
+                  <input type="date" id="leaseEnd" style="flex: 1; padding: 10px 16px; border: 1px solid #cbd5e1; border-radius: var(--border-radius-sm); font-size: 14px; outline: none; background: var(--bg-card); color: var(--text-main);">
+                </div>
+              </div>
+              <div class="form-group" style="position: relative;">
+                <label for="roomStructure" style="display: flex; justify-content: space-between; align-items: center;">
+                  <span>구조/옵션 이모지</span>
+                  <button type="button" class="btn-emoji-help" id="emojiHelpBtn" title="이모지 예시 보기">
+                    <i data-lucide="help-circle" style="width: 14px; height: 14px; display: inline-block;"></i> 예시
+                  </button>
+                </label>
+                <input type="text" id="roomStructure" placeholder="예: 🚪🚪 🚽 (방2 화1)">
+                <div class="emoji-popover" id="emojiPopover">
+                  <div class="emoji-popover-header">
+                    <span>자주 쓰는 이모지 클릭 입력</span>
+                    <button type="button" id="emojiPopoverCloseBtn">&times;</button>
+                  </div>
+                  <div class="emoji-suggestions" id="emojiSuggestions">
+                    <button type="button" class="emoji-btn" data-emoji="🚪">🚪 방</button>
+                    <button type="button" class="emoji-btn" data-emoji="🚽">🚽 화장실</button>
+                    <button type="button" class="emoji-btn" data-emoji="❄️">❄️ 에어컨</button>
+                    <button type="button" class="emoji-btn" data-emoji="🧊">🧊 냉장고</button>
+                    <button type="button" class="emoji-btn" data-emoji="🔥">🔥 가스렌지</button>
+                    <button type="button" class="emoji-btn" data-emoji="⚡">⚡ 전자렌지</button>
+                    <button type="button" class="emoji-btn" data-emoji="🧺">🧺 옷장</button>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="roomDeposit">보증금</label>
+                <input type="text" id="roomDeposit" placeholder="예: 200만원">
+              </div>
+              <div class="form-group">
+                <label for="roomRent">월세</label>
+                <input type="text" id="roomRent" placeholder="예: 25만원">
+              </div>
+            </div>
+          </section>
+
+          <section class="info-section">
+            <h3 class="pane-title" style="display: flex; justify-content: space-between; align-items: center; padding-right: 8px;">
+              <span><i data-lucide="user"></i> 세입자 연락 정보</span>
+              <button type="button" class="btn btn-secondary btn-sm" id="addTenantFormBtn" style="padding: 4px 8px; font-size: 12px; height: 26px;">
+                <i data-lucide="plus" style="width: 12px; height: 12px;"></i> 추가
+              </button>
+            </h3>
+            <div id="tenantsContainer">
+              <!-- JS에서 동적으로 세입자 폼이 렌더링됩니다 -->
+            </div>
+          </section>
+
+          <section class="info-section">
+            <h3 class="pane-title"><i data-lucide="sticky-note"></i> 특이사항 및 메모</h3>
+            <div class="form-group">
+              <textarea id="roomNotes" rows="4" placeholder="호실 관련 특이사항이나 점검사항을 입력하세요."></textarea>
+            </div>
+          </section>
+          
+          <div class="room-action-area">
+            <button id="deleteRoomBtn" class="btn btn-danger-outline btn-full">
+              <i data-lucide="trash-2"></i> 현재 호실 완전히 삭제하기
+            </button>
+          </div>
+        </div>
+
+        <!-- 오른쪽 열: 시설 이미지 등록 및 설비 이력 등록 -->
+        <div class="modal-right-pane">
+          <!-- 1. 시설물 이미지 등록/보기 -->
+          <section class="info-section">
+            <h3 class="pane-title"><i data-lucide="image"></i> 각 시설물 이미지</h3>
+            
+            <!-- 업로드 폼 -->
+            <form id="facilityImageForm" class="upload-form">
+              <div class="file-upload-wrapper">
+                <input type="file" id="facilityImageInput" accept="image/*" class="file-input" required>
+                <label for="facilityImageInput" class="file-label">
+                  <i data-lucide="upload-cloud"></i>
+                  <span>시설물 사진 선택</span>
+                </label>
+              </div>
+              <div class="upload-input-group">
+                <input type="text" id="facilityNameInput" placeholder="시설물명 (예: 보일러, 싱크대)" required>
+                <button type="submit" class="btn btn-primary" id="uploadImageBtn">업로드</button>
+              </div>
+            </form>
+
+            <!-- 이미지 갤러리 -->
+            <div class="facility-gallery" id="facilityGallery">
+              <!-- JS에서 동적으로 채움 -->
+              <p class="empty-text">등록된 시설물 이미지가 없습니다.</p>
+            </div>
+          </section>
+
+          <!-- 2. 설비 구매 및 유지보수 이력 -->
+          <section class="info-section">
+            <h3 class="pane-title"><i data-lucide="wrench"></i> 설비 구매 및 유지관리 이력</h3>
+            
+            <!-- 이력 추가 폼 -->
+            <div class="ac-history-form">
+              <div class="ac-form-inputs">
+                <input type="date" id="acDateInput" required>
+                <select id="acTypeInput">
+                  <option value="purchase">🛒 구매/설치</option>
+                  <option value="maintenance">🛠️ 수리/청소</option>
+                </select>
+              </div>
+              <div class="ac-form-desc">
+                <input type="text" id="acDescInput" placeholder="예: 에어컨 신규 설치, 보일러 교체, 배관 수리" required>
+                <button id="addAcHistoryBtn" class="btn btn-primary">이력 등록</button>
+              </div>
+            </div>
+
+            <!-- 이력 타임라인 -->
+            <div class="ac-history-timeline" id="acHistoryTimeline">
+              <!-- JS에서 동적으로 채움 -->
+              <p class="empty-text">등록된 설비 이력이 없습니다.</p>
+            </div>
+          </section>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modalCancelBtn">취소</button>
+        <button class="btn btn-primary" id="modalSaveBtn">수정사항 저장</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

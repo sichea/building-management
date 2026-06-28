@@ -1,0 +1,446 @@
+-- 1. 대시보드 건물/호실 전체 상태를 저장할 테이블 생성
+create table if not exists building_data (
+  id bigint primary key,
+  data jsonb not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- 2. 테이블 행 수준 보안(RLS) 활성화
+alter table building_data enable row level security;
+
+-- RLS 정책 설정 (임시로 누구나 읽고 쓸 수 있도록 전체 허용 - 향후 운영 시 필요에 따라 인증 사용자 제한 가능)
+drop policy if exists "Allow public read and write" on building_data;
+create policy "Allow public read and write"
+on building_data for all
+using (true)
+with check (true);
+
+-- 3. 기존 로컬 데이터를 Supabase 클라우드로 최초 이관 (1번 레코드로 데이터 동기화 유지)
+insert into building_data (id, data, updated_at)
+values (
+  1,
+  '{
+  "buildings": [
+    {
+      "id": "b-1782310040299",
+      "name": "2492번지",
+      "rooms": [
+        {
+          "id": "r-1782310672200",
+          "number": "폭탄토핑피자",
+          "floor": 1,
+          "roomType": "store",
+          "status": "occupied",
+          "leaseType": "wolse",
+          "deposit": "500",
+          "rent": "50",
+          "structure": "",
+          "tenantName": "",
+          "contact": "",
+          "facilities": [],
+          "acHistory": [],
+          "notes": "",
+          "slotSize": 2,
+          "tenantEmergency": "",
+          "leasePeriod": "",
+          "tenants": [
+            {
+              "name": "",
+              "contact": "",
+              "emergency": "",
+              "leasePeriod": ""
+            }
+          ]
+        },
+        {
+          "id": "r-1782310632475",
+          "number": "선희네 옷",
+          "floor": 1,
+          "roomType": "store",
+          "status": "occupied",
+          "leaseType": "wolse",
+          "deposit": "500",
+          "rent": "50",
+          "structure": "🚽",
+          "tenantName": "",
+          "contact": "",
+          "facilities": [],
+          "acHistory": [],
+          "notes": "",
+          "tenantEmergency": "",
+          "leasePeriod": "",
+          "slotSize": 1,
+          "tenants": [
+            {
+              "name": "",
+              "contact": "",
+              "emergency": "",
+              "leasePeriod": ""
+            }
+          ]
+        },
+        {
+          "id": "r-1782310536300",
+          "number": "201호",
+          "floor": 2,
+          "roomType": "oneroom",
+          "status": "occupied",
+          "leaseType": "wolse",
+          "deposit": "200",
+          "rent": "",
+          "structure": "🚪🚽❄️🧊🔥",
+          "tenantName": "",
+          "contact": "",
+          "facilities": [],
+          "acHistory": [],
+          "notes": "",
+          "slotSize": 1,
+          "tenantEmergency": "",
+          "leasePeriod": "2026-06-10 ~ 2026-06-27",
+          "tenants": [
+            {
+              "name": "",
+              "contact": "",
+              "emergency": "",
+              "leasePeriod": ""
+            }
+          ]
+        },
+        {
+          "id": "r-1782310553628",
+          "number": "202호",
+          "floor": 2,
+          "roomType": "tworoom",
+          "status": "occupied",
+          "leaseType": "wolse",
+          "deposit": "",
+          "rent": "",
+          "structure": "🚪🚽🔥",
+          "tenantName": "전종일",
+          "contact": "",
+          "facilities": [],
+          "acHistory": [],
+          "notes": "",
+          "slotSize": 2,
+          "tenantEmergency": "",
+          "leasePeriod": "",
+          "tenants": [
+            {
+              "name": "전종일",
+              "contact": "",
+              "emergency": "",
+              "leasePeriod": ""
+            }
+          ]
+        },
+        {
+          "id": "r-1782311664863",
+          "number": "203호",
+          "floor": 2,
+          "roomType": "tworoom",
+          "status": "occupied",
+          "leaseType": "wolse",
+          "deposit": "",
+          "rent": "",
+          "structure": "🚪🚽🔥",
+          "tenantName": "",
+          "contact": "",
+          "tenantEmergency": "",
+          "leasePeriod": "",
+          "facilities": [],
+          "acHistory": [],
+          "notes": "",
+          "slotSize": 2,
+          "tenants": [
+            {
+              "name": "",
+              "contact": "",
+              "emergency": "",
+              "leasePeriod": ""
+            }
+          ]
+        },
+        {
+          "id": "r-1782310101004",
+          "number": "우리집",
+          "floor": 3,
+          "roomType": "full",
+          "status": "occupied",
+          "leaseType": "",
+          "deposit": "",
+          "rent": "",
+          "structure": "🚪🚪🚪 🚽🚽❄️🧊🔥⚡🧺",
+          "tenantName": "",
+          "contact": "",
+          "facilities": [],
+          "acHistory": [],
+          "notes": "",
+          "slotSize": 5,
+          "tenantEmergency": "",
+          "leasePeriod": "",
+          "tenants": [
+            {
+              "name": "",
+              "contact": "",
+              "emergency": "",
+              "leasePeriod": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b-1782310060216",
+      "name": "2209번지",
+      "rooms": [
+        {
+          "id": "r-1782313194397",
+          "number": "101호",
+          "floor": 1,
+          "roomType": "oneroom",
+          "slotSize": 1,
+          "status": "occupied",
+          "leaseType": "wolse",
+          "deposit": "200",
+          "rent": "",
+          "structure": "🚪🚽❄️🧊🔥",
+          "tenantName": "김정숙",
+          "contact": "",
+          "tenantEmergency": "",
+          "leasePeriod": "",
+          "tenants": [
+            {
+              "name": "김정숙",
+              "contact": "",
+              "emergency": "",
+              "leasePeriod": ""
+            }
+          ],
+          "facilities": [],
+          "acHistory": [],
+          "notes": ""
+        },
+        {
+          "id": "r-1782313210559",
+          "number": "102호",
+          "floor": 1,
+          "roomType": "tworoom",
+          "slotSize": 2,
+          "status": "vacant",
+          "leaseType": "wolse",
+          "deposit": "500",
+          "rent": "",
+          "structure": "🚪🚪🚽❄️🔥",
+          "tenantName": "",
+          "contact": "",
+          "tenantEmergency": "",
+          "leasePeriod": "",
+          "tenants": [
+            {
+              "name": "",
+              "contact": "",
+              "emergency": "",
+              "leasePeriod": ""
+            }
+          ],
+          "facilities": [],
+          "acHistory": [],
+          "notes": ""
+        },
+        {
+          "id": "r-1782313228383",
+          "number": "103호",
+          "floor": 1,
+          "roomType": "oneroom",
+          "slotSize": 1,
+          "status": "occupied",
+          "leaseType": "wolse",
+          "deposit": "200",
+          "rent": "",
+          "structure": "🚪🚽❄️🧊🔥",
+          "tenantName": "",
+          "contact": "",
+          "tenantEmergency": "",
+          "leasePeriod": "",
+          "tenants": [
+            {
+              "name": "",
+              "contact": "",
+              "emergency": "",
+              "leasePeriod": ""
+            }
+          ],
+          "facilities": [],
+          "acHistory": [],
+          "notes": ""
+        },
+        {
+          "id": "r-1782313236720",
+          "number": "104호",
+          "floor": 1,
+          "roomType": "oneroom",
+          "slotSize": 1,
+          "status": "occupied",
+          "leaseType": "wolse",
+          "deposit": "200",
+          "rent": "",
+          "structure": "🚪🚽❄️🧊🔥",
+          "tenantName": "",
+          "contact": "",
+          "tenantEmergency": "",
+          "leasePeriod": "",
+          "tenants": [
+            {
+              "name": "",
+              "contact": "",
+              "emergency": "",
+              "leasePeriod": ""
+            }
+          ],
+          "facilities": [],
+          "acHistory": [],
+          "notes": ""
+        },
+        {
+          "id": "r-1782313269398",
+          "number": "3층집",
+          "floor": 3,
+          "roomType": "full",
+          "slotSize": 5,
+          "status": "occupied",
+          "leaseType": "banjeonse",
+          "deposit": "",
+          "rent": "",
+          "structure": "🚪🚪🚪🚽🚽",
+          "tenantName": "최은실",
+          "contact": "",
+          "tenantEmergency": "",
+          "leasePeriod": "",
+          "tenants": [
+            {
+              "name": "최은실",
+              "contact": "",
+              "emergency": "",
+              "leasePeriod": ""
+            }
+          ],
+          "facilities": [],
+          "acHistory": [],
+          "notes": ""
+        },
+        {
+          "id": "r-1782313280697",
+          "number": "201호",
+          "floor": 2,
+          "roomType": "oneroom",
+          "slotSize": 1,
+          "status": "occupied",
+          "leaseType": "wolse",
+          "deposit": "200",
+          "rent": "",
+          "structure": "🚪🚽❄️🧊🔥",
+          "tenantName": "찔리메이",
+          "contact": "",
+          "tenantEmergency": "",
+          "leasePeriod": "",
+          "tenants": [
+            {
+              "name": "찔리메이",
+              "contact": "",
+              "emergency": "",
+              "leasePeriod": ""
+            }
+          ],
+          "facilities": [],
+          "acHistory": [],
+          "notes": ""
+        },
+        {
+          "id": "r-1782313295409",
+          "number": "202호",
+          "floor": 2,
+          "roomType": "tworoom",
+          "slotSize": 2,
+          "status": "occupied",
+          "leaseType": "jeonse",
+          "deposit": "5000",
+          "rent": "",
+          "structure": "🚪🚪🚽",
+          "tenantName": "",
+          "contact": "",
+          "tenantEmergency": "",
+          "leasePeriod": "",
+          "tenants": [
+            {
+              "name": "",
+              "contact": "",
+              "emergency": "",
+              "leasePeriod": ""
+            }
+          ],
+          "facilities": [],
+          "acHistory": [],
+          "notes": ""
+        },
+        {
+          "id": "r-1782313305871",
+          "number": "203호",
+          "floor": 2,
+          "roomType": "oneroom",
+          "slotSize": 1,
+          "status": "occupied",
+          "leaseType": "wolse",
+          "deposit": "200",
+          "rent": "",
+          "structure": "🚪🚽❄️🧊🔥⚡",
+          "tenantName": "",
+          "contact": "",
+          "tenantEmergency": "",
+          "leasePeriod": "",
+          "tenants": [
+            {
+              "name": "",
+              "contact": "",
+              "emergency": "",
+              "leasePeriod": ""
+            }
+          ],
+          "facilities": [],
+          "acHistory": [],
+          "notes": ""
+        },
+        {
+          "id": "r-1782313316630",
+          "number": "204호",
+          "floor": 2,
+          "roomType": "oneroom",
+          "slotSize": 1,
+          "status": "occupied",
+          "leaseType": "wolse",
+          "deposit": "200",
+          "rent": "",
+          "structure": "🚪🚽❄️🧊🔥",
+          "tenantName": "",
+          "contact": "",
+          "tenantEmergency": "",
+          "leasePeriod": "",
+          "tenants": [
+            {
+              "name": "",
+              "contact": "",
+              "emergency": "",
+              "leasePeriod": ""
+            }
+          ],
+          "facilities": [],
+          "acHistory": [],
+          "notes": ""
+        }
+      ]
+    }
+  ]
+}',
+  now()
+)
+on conflict (id) do update
+set data = excluded.data, updated_at = now();
