@@ -2219,18 +2219,23 @@ body {
     display: none !important; /* 창틀 십자선은 작아서 숨김 */
   }
 
-  /* 구조 이모지 크기 및 넘침 방지 */
+  /* 구조 이모지 크기 및 넘침 방지 (말줄임표 ... 표시 확실하게 강제) */
   .room-visual.room-structure-emoji {
-    height: auto !important;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
+    display: block !important;
+    height: 20px !important;
+    overflow: hidden !important;
+    max-width: 100% !important;
+    margin-bottom: 2px !important;
   }
   
   .room-visual.room-structure-emoji span {
+    display: block !important;
     font-size: 10px !important;
     letter-spacing: -1px;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 100% !important;
   }
 
   /* 세입자 정보 축소 */
