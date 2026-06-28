@@ -2157,21 +2157,11 @@ body {
   }
   
   .stat-card {
-    padding: 10px 8px !important;
+    padding: 10px 12px !important;
     gap: 8px !important;
     border-radius: var(--border-radius-sm) !important;
-    align-items: center !important;
-  }
-  
-  .stat-icon {
-    width: 28px !important;
-    height: 28px !important;
-    border-radius: 6px !important;
-  }
-  
-  .stat-icon i {
-    width: 14px !important;
-    height: 14px !important;
+    align-items: flex-start !important; /* 왼쪽 정렬 */
+    text-align: left !important;
   }
   
   .stat-label {
