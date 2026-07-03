@@ -1,5 +1,8 @@
 /* CSS 변수 선언 - 프리미엄 컬러 팔레트 */
 :root {
+  /* 항상 라이트 모드(화이트 모드)로 강제 고정 */
+  color-scheme: only light;
+  
   --font-main: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   
   /* 색상 테마 */
