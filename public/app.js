@@ -1233,11 +1233,9 @@ function renderSummaryDashboard() {
 
       tableRows += `
         <tr>
-          <td class="room-num">${r.number}</td>
-          <td><span class="room-status-badge ${r.status}">${statusLabel}</span></td>
-          <td style="font-weight:700;">${depositRentStr}</td>
-          <td>${tenantName}</td>
-          <td>${structureStr}</td>
+          <td class="room-num" style="max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${r.number}</td>
+          <td style="font-weight:700;white-space:nowrap;">${depositRentStr}</td>
+          <td style="max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${tenantName}</td>
         </tr>
       `;
     });
@@ -1247,15 +1245,13 @@ function renderSummaryDashboard() {
         <table class="summary-table">
           <thead>
             <tr>
-              <th>호실</th>
-              <th>상태</th>
-              <th>보증금/월세</th>
-              <th>세입자</th>
-              <th>구조/옵션</th>
+              <th style="white-space:nowrap;">호실</th>
+              <th style="white-space:nowrap;">보증금/월세</th>
+              <th style="white-space:nowrap;">세입자</th>
             </tr>
           </thead>
           <tbody>
-            ${tableRows || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">등록된 호실이 없습니다.</td></tr>'}
+            ${tableRows || '<tr><td colspan="3" style="text-align:center;color:var(--text-muted);">등록된 호실이 없습니다.</td></tr>'}
           </tbody>
         </table>
       </div>

@@ -2534,6 +2534,7 @@ body {
   border-collapse: collapse;
   text-align: left;
   font-size: 13px;
+  table-layout: fixed;
 }
 
 .summary-table th {
@@ -2543,12 +2544,17 @@ body {
   padding: 10px 12px;
   border-bottom: 1px solid #e2e8f0;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .summary-table td {
   padding: 10px 12px;
   border-bottom: 1px solid #f1f5f9;
   color: var(--text-main);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .summary-table tr:last-child td {
@@ -2562,6 +2568,7 @@ body {
 .summary-table .room-num {
   font-weight: 800;
   color: var(--primary);
+  max-width: 80px;
 }
 
 .summary-table .room-status-badge {
