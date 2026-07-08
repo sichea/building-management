@@ -1525,7 +1525,6 @@ body {
   .stat-icon-wrapper {
     display: none;
   }
-  }
 
   .stat-icon-wrapper {
     width: 36px;
@@ -2786,8 +2785,16 @@ body {
 @media (max-width: 768px) {
   .financial-summary-text {
     flex-direction: column;
-    gap: 8px;
+    gap: 0;
     align-items: flex-start;
   }
-}
 
+  .financial-summary-item {
+    padding: 8px 0;
+    width: 100%;
+  }
+
+  .financial-summary-item:not(:last-child) {
+    border-bottom: 1px solid #e2e8f0;
+  }
+}

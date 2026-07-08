@@ -455,17 +455,6 @@ function renderFinancialStats() {
     `;
     
     container.appendChild(item);
-    
-    if (idx < sortedBuildings.length - 1) {
-      const spacingDiv = document.createElement('div');
-      spacingDiv.style.cssText = `
-        width: 1px;
-        height: 14px;
-        background: #cbd5e1;
-        margin: 0 12px;
-      `;
-      container.appendChild(spacingDiv);
-    }
   });
 }
 
