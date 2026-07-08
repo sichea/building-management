@@ -2736,3 +2736,51 @@ body {
   color: #b91c1c;
 }
 
+/* 대시보드 건물별 보증금/월세 요약 (통계카드 밑 배치) */
+.financial-summary-text {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 24px;
+  margin-top: -8px;
+  margin-bottom: 24px;
+  background: var(--bg-card);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: var(--border-radius-sm);
+  padding: 10px 20px;
+  box-shadow: var(--shadow-sm);
+  font-size: 13px;
+  color: var(--text-main);
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.financial-summary-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.financial-summary-item strong {
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.financial-summary-item .highlight-val {
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.financial-summary-item .divider {
+  color: #cbd5e1;
+  margin: 0 4px;
+}
+
+@media (max-width: 768px) {
+  .financial-summary-text {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+}
+

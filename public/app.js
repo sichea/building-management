@@ -171,6 +171,15 @@ async function fetchBuildingsData(silent = false) {
 // UI 렌더링 함수
 // ----------------------------------------------------
 
+// 건물 이름 표시 변환 헬퍼 (2209번지를 유진빌로 표시)
+function getBuildingDisplayName(building) {
+  if (!building) return '';
+  if (building.id === "b-1782310060216" || building.name === "2209번지" || building.name.includes("2209")) {
+    return "유진빌";
+  }
+  return building.name;
+}
+
 // 건물 선택 탭 바 렌더링
 function renderBuildingTabs() {
   if (!DOM.buildingTabs) return;
@@ -189,11 +198,12 @@ function renderBuildingTabs() {
   });
   DOM.buildingTabs.appendChild(summaryTab);
   
-  // 2. 개별 건물 탭 추가
-  state.buildings.forEach(building => {
+  // 2. 개별 건물 탭 추가 (ID 순서로 정렬하여 2492번지가 항상 왼쪽에 오도록 배치)
+  const sortedBuildings = [...state.buildings].sort((a, b) => a.id.localeCompare(b.id));
+  sortedBuildings.forEach(building => {
     const tab = document.createElement('button');
     tab.className = `building-tab ${state.selectedBuildingId === building.id ? 'active' : ''}`;
-    tab.textContent = building.name;
+    tab.textContent = getBuildingDisplayName(building);
     tab.addEventListener('click', () => {
       state.selectedBuildingId = building.id;
       renderBuildingTabs();
@@ -205,28 +215,7 @@ function renderBuildingTabs() {
 
 // 대시보드 렌더링 (선택된 건물만 혹은 전체 건물 3D 뷰 렌더링)
 function renderDashboard() {
-  if (state.selectedBuildingId === 'summary') {
-    if (DOM.building3DWrapper) DOM.building3DWrapper.style.display = 'none';
-    if (DOM.summaryDashboard) DOM.summaryDashboard.style.display = 'grid';
-    if (DOM.deleteActiveBuildingBtn) DOM.deleteActiveBuildingBtn.style.display = 'none';
-    renderSummaryDashboard();
-    return;
-  } else {
-    if (DOM.building3DWrapper) DOM.building3DWrapper.style.display = 'block';
-    if (DOM.summaryDashboard) DOM.summaryDashboard.style.display = 'none';
-  }
-
-  DOM.building3D.innerHTML = '';
-  
-  if (state.buildings.length === 0) {
-    DOM.statTotal.textContent = '0';
-    DOM.statOccupied.textContent = '0';
-    DOM.statVacant.textContent = '0';
-    lucide.createIcons();
-    return;
-  }
-  
-  // 전체 통계 계산 (모든 건물 합산)
+  // 전체 통계 계산 (종합 탭에서도 통계 카드가 0이 아닌 실제 수치가 나오도록 최상단에서 우선 연산)
   let totalAll = 0, occupiedAll = 0, vacantAll = 0;
   state.buildings.forEach(b => {
     const rooms = b.rooms || [];
@@ -238,6 +227,27 @@ function renderDashboard() {
   DOM.statTotal.textContent = totalAll;
   DOM.statOccupied.textContent = occupiedAll;
   DOM.statVacant.textContent = vacantAll;
+
+  if (state.selectedBuildingId === 'summary') {
+    if (DOM.building3DWrapper) DOM.building3DWrapper.style.display = 'none';
+    if (DOM.summaryDashboard) DOM.summaryDashboard.style.display = 'grid';
+    if (DOM.deleteActiveBuildingBtn) DOM.deleteActiveBuildingBtn.style.display = 'none';
+    renderSummaryDashboard();
+    return;
+  } else {
+    if (DOM.building3DWrapper) DOM.building3DWrapper.style.display = 'block';
+    if (DOM.summaryDashboard) DOM.summaryDashboard.style.display = 'none';
+  }
+  
+  DOM.building3D.innerHTML = '';
+  
+  if (state.buildings.length === 0) {
+    DOM.statTotal.textContent = '0';
+    DOM.statOccupied.textContent = '0';
+    DOM.statVacant.textContent = '0';
+    lucide.createIcons();
+    return;
+  }
   
   // 전체 보기('all') 인 경우
   if (state.selectedBuildingId === 'all') {
@@ -413,15 +423,22 @@ function renderDashboard() {
   lucide.createIcons();
 }
 
-// 건물별 재정 요약 카드 렌더링
+// 건물별 재정 요약 텍스트 렌더링
 function renderFinancialStats() {
   const container = DOM.financialStatsContainer || document.getElementById('financialStatsContainer');
   if (!container) return;
   container.innerHTML = '';
   
-  if (state.buildings.length === 0) return;
+  if (state.buildings.length === 0) {
+    container.style.display = 'none';
+    return;
+  }
+  container.style.display = 'flex';
   
-  state.buildings.forEach(building => {
+  // ID 순서로 정렬하여 2492번지가 항상 왼쪽에 오도록 배치
+  const sortedBuildings = [...state.buildings].sort((a, b) => a.id.localeCompare(b.id));
+  
+  sortedBuildings.forEach((building, idx) => {
     let totalDeposit = 0;
     let totalRent = 0;
     (building.rooms || []).forEach(r => {
@@ -429,38 +446,30 @@ function renderFinancialStats() {
       if (r.rent) totalRent += parseInt(r.rent) || 0;
     });
     
-    const card = document.createElement('div');
-    card.className = 'financial-stat-card';
-    card.style.cssText = `
-      flex: 1;
-      min-width: 240px;
-      background: var(--bg-card);
-      border: 1px solid rgba(226, 232, 240, 0.8);
-      border-radius: var(--border-radius-sm);
-      padding: 14px 20px;
-      box-shadow: var(--shadow-sm);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      transition: var(--transition);
+    const item = document.createElement('div');
+    item.className = 'financial-summary-item';
+    
+    item.innerHTML = `
+      🏢 <strong>${getBuildingDisplayName(building)}</strong>
+      <span class="divider">:</span>
+      보증금 <span class="highlight-val">${totalDeposit.toLocaleString()}</span>만 
+      <span class="divider">/</span>
+      월세 <span class="highlight-val" style="color: var(--occupied);">${totalRent.toLocaleString()}</span>만
     `;
     
-    card.innerHTML = `
-      <div>
-        <span style="font-size: 11px; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 4px;">${building.name} 재정 요약</span>
-        <span style="font-size: 15px; font-weight: 800; color: var(--text-main);">
-          보증금 <span style="color: var(--primary);">${totalDeposit.toLocaleString()}</span>만 / 
-          월세 <span style="color: var(--occupied);">${totalRent.toLocaleString()}</span>만
-        </span>
-      </div>
-      <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-        <i data-lucide="wallet" style="width: 18px; height: 18px;"></i>
-      </div>
-    `;
-    container.appendChild(card);
+    container.appendChild(item);
+    
+    if (idx < sortedBuildings.length - 1) {
+      const spacingDiv = document.createElement('div');
+      spacingDiv.style.cssText = `
+        width: 1px;
+        height: 14px;
+        background: #cbd5e1;
+        margin: 0 12px;
+      `;
+      container.appendChild(spacingDiv);
+    }
   });
-  
-  lucide.createIcons();
 }
 
 // 슬롯 크기 헬퍼
@@ -1200,7 +1209,7 @@ function renderSummaryDashboard() {
     
     let headerHtml = `
       <div class="summary-card-header">
-        <h4 class="summary-card-title"><i data-lucide="building"></i> ${building.name}</h4>
+        <h4 class="summary-card-title"><i data-lucide="building"></i> ${getBuildingDisplayName(building)}</h4>
         <div class="summary-card-header-totals">
           <span class="summary-total-badge" title="총 보증금 / 월세">
             <i data-lucide="wallet" style="width:12px; height:12px;"></i> 보증금 ${totalDeposit}/${totalRent}
