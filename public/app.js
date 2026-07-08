@@ -7,7 +7,8 @@ let state = {
   buildings: [],
   selectedBuildingId: null,
   selectedRoomId: null,
-  isModalOpen: false
+  isModalOpen: false,
+  summaryExtras: { expenses: {}, antenna: {} }
 };
 
 // DOM 요소 참조 캐싱
@@ -73,7 +74,28 @@ const DOM = {
   acTypeInput: document.getElementById('acTypeInput'),
   acDescInput: document.getElementById('acDescInput'),
   addAcHistoryBtn: document.getElementById('addAcHistoryBtn'),
-  acHistoryTimeline: document.getElementById('acHistoryTimeline')
+  acHistoryTimeline: document.getElementById('acHistoryTimeline'),
+  
+  // 요약 대시보드 관련
+  building3DWrapper: document.getElementById('building3DWrapper'),
+  summaryDashboard: document.getElementById('summaryDashboard'),
+  
+  // 지출 편집 모달 관련
+  editExpensesModal: document.getElementById('editExpensesModal'),
+  expensesContainer2209: document.getElementById('expensesContainer2209'),
+  addExpBtn2209: document.getElementById('addExpBtn2209'),
+  expensesContainer2492: document.getElementById('expensesContainer2492'),
+  addExpBtn2492: document.getElementById('addExpBtn2492'),
+  saveExpensesBtn: document.getElementById('saveExpensesBtn'),
+  
+  // 추가수익 편집 모달 관련
+  editRevenueModal: document.getElementById('editRevenueModal'),
+  revenueContainer: document.getElementById('revenueContainer'),
+  addRevBtn: document.getElementById('addRevBtn'),
+  saveRevenueBtn: document.getElementById('saveRevenueBtn'),
+  
+  // 건물별 재정 요약 컨테이너
+  financialStatsContainer: document.getElementById('financialStatsContainer')
 };
 
 // ----------------------------------------------------
@@ -117,10 +139,16 @@ async function fetchBuildingsData(silent = false) {
     const buildings = await res.json();
     state.buildings = buildings;
     
-    // 전체 보기('all') 또는 유효한 건물을 선택
+    // 추가 요약 정보 로드
+    const extrasRes = await fetch('/api/summary-extras');
+    if (extrasRes.ok) {
+      state.summaryExtras = await extrasRes.json();
+    }
+    
+    // 기본 선택을 'summary'(종합)로 설정
     if (buildings.length > 0) {
-      if (!state.selectedBuildingId || (state.selectedBuildingId !== 'all' && !buildings.some(b => b.id === state.selectedBuildingId))) {
-        state.selectedBuildingId = 'all';
+      if (!state.selectedBuildingId || (state.selectedBuildingId !== 'summary' && !buildings.some(b => b.id === state.selectedBuildingId))) {
+        state.selectedBuildingId = 'summary';
       }
     } else {
       state.selectedBuildingId = null;
@@ -128,6 +156,7 @@ async function fetchBuildingsData(silent = false) {
     
     renderBuildingTabs();
     renderDashboard();
+    renderFinancialStats();
     
     // 상세 모달이 열려 있다면, 내부 데이터도 조용히 백그라운드 갱신
     if (state.isModalOpen && state.selectedRoomId) {
@@ -149,16 +178,16 @@ function renderBuildingTabs() {
   
   if (state.buildings.length === 0) return;
   
-  // 1. 전체 보기 탭 추가 (제일 왼쪽)
-  const allTab = document.createElement('button');
-  allTab.className = `building-tab ${state.selectedBuildingId === 'all' ? 'active' : ''}`;
-  allTab.textContent = '전체';
-  allTab.addEventListener('click', () => {
-    state.selectedBuildingId = 'all';
+  // 1. 종합 탭 추가 (제일 왼쪽)
+  const summaryTab = document.createElement('button');
+  summaryTab.className = `building-tab ${state.selectedBuildingId === 'summary' ? 'active' : ''}`;
+  summaryTab.innerHTML = `<i data-lucide="layout-dashboard" style="width:14px; height:14px; display:inline-block; vertical-align:middle; margin-right:4px;"></i>종합`;
+  summaryTab.addEventListener('click', () => {
+    state.selectedBuildingId = 'summary';
     renderBuildingTabs();
     renderDashboard();
   });
-  DOM.buildingTabs.appendChild(allTab);
+  DOM.buildingTabs.appendChild(summaryTab);
   
   // 2. 개별 건물 탭 추가
   state.buildings.forEach(building => {
@@ -176,6 +205,17 @@ function renderBuildingTabs() {
 
 // 대시보드 렌더링 (선택된 건물만 혹은 전체 건물 3D 뷰 렌더링)
 function renderDashboard() {
+  if (state.selectedBuildingId === 'summary') {
+    if (DOM.building3DWrapper) DOM.building3DWrapper.style.display = 'none';
+    if (DOM.summaryDashboard) DOM.summaryDashboard.style.display = 'grid';
+    if (DOM.deleteActiveBuildingBtn) DOM.deleteActiveBuildingBtn.style.display = 'none';
+    renderSummaryDashboard();
+    return;
+  } else {
+    if (DOM.building3DWrapper) DOM.building3DWrapper.style.display = 'block';
+    if (DOM.summaryDashboard) DOM.summaryDashboard.style.display = 'none';
+  }
+
   DOM.building3D.innerHTML = '';
   
   if (state.buildings.length === 0) {
@@ -369,6 +409,56 @@ function renderDashboard() {
   }
   
   DOM.building3D.appendChild(buildingWrap);
+  
+  lucide.createIcons();
+}
+
+// 건물별 재정 요약 카드 렌더링
+function renderFinancialStats() {
+  const container = DOM.financialStatsContainer || document.getElementById('financialStatsContainer');
+  if (!container) return;
+  container.innerHTML = '';
+  
+  if (state.buildings.length === 0) return;
+  
+  state.buildings.forEach(building => {
+    let totalDeposit = 0;
+    let totalRent = 0;
+    (building.rooms || []).forEach(r => {
+      if (r.deposit) totalDeposit += parseInt(r.deposit) || 0;
+      if (r.rent) totalRent += parseInt(r.rent) || 0;
+    });
+    
+    const card = document.createElement('div');
+    card.className = 'financial-stat-card';
+    card.style.cssText = `
+      flex: 1;
+      min-width: 240px;
+      background: var(--bg-card);
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      border-radius: var(--border-radius-sm);
+      padding: 14px 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: var(--transition);
+    `;
+    
+    card.innerHTML = `
+      <div>
+        <span style="font-size: 11px; color: var(--text-muted); font-weight: 700; display: block; margin-bottom: 4px;">${building.name} 재정 요약</span>
+        <span style="font-size: 15px; font-weight: 800; color: var(--text-main);">
+          보증금 <span style="color: var(--primary);">${totalDeposit.toLocaleString()}</span>만 / 
+          월세 <span style="color: var(--occupied);">${totalRent.toLocaleString()}</span>만
+        </span>
+      </div>
+      <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i data-lucide="wallet" style="width: 18px; height: 18px;"></i>
+      </div>
+    `;
+    container.appendChild(card);
+  });
   
   lucide.createIcons();
 }
@@ -1085,9 +1175,376 @@ if (DOM.deleteActiveBuildingBtn) {
 }
 
 // ----------------------------------------------------
+// 요약 대시보드 (종합) 렌더링 및 기능 구현
+// ----------------------------------------------------
+function renderSummaryDashboard() {
+  if (!DOM.summaryDashboard) return;
+  DOM.summaryDashboard.innerHTML = '';
+
+  const extras = state.summaryExtras || { expenses: {}, revenue: [] };
+  const exp = extras.expenses || {};
+  const rev = extras.revenue || [];
+
+  // 1. 건물별 요약 카드 생성
+  state.buildings.forEach(building => {
+    const rooms = building.rooms || [];
+    let totalDeposit = 0;
+    let totalRent = 0;
+    rooms.forEach(r => {
+      if (r.deposit) totalDeposit += parseInt(r.deposit) || 0;
+      if (r.rent) totalRent += parseInt(r.rent) || 0;
+    });
+
+    const card = document.createElement('div');
+    card.className = 'summary-card';
+    
+    let headerHtml = `
+      <div class="summary-card-header">
+        <h4 class="summary-card-title"><i data-lucide="building"></i> ${building.name}</h4>
+        <div class="summary-card-header-totals">
+          <span class="summary-total-badge" title="총 보증금 / 월세">
+            <i data-lucide="wallet" style="width:12px; height:12px;"></i> 보증금 ${totalDeposit}/${totalRent}
+          </span>
+        </div>
+      </div>
+    `;
+
+    let tableRows = '';
+    rooms.forEach(r => {
+      const statusLabel = r.status === 'occupied' ? '입주' : '공실';
+      const depositRentStr = r.deposit || r.rent ? `${r.deposit || 0}/${r.rent || 0}` : '-';
+      const structureStr = r.structure ? `<span style="font-size:11px;" title="${r.structure}">${r.structure}</span>` : '-';
+      
+      let tenantName = '-';
+      if (r.status === 'occupied') {
+        if (r.tenants && r.tenants.length > 0 && r.tenants[0].name) {
+          tenantName = r.tenants[0].name;
+          if (r.tenants.length > 1) tenantName += ` 외 ${r.tenants.length - 1}명`;
+        } else if (r.tenantName) {
+          tenantName = r.tenantName;
+        }
+      }
+
+      tableRows += `
+        <tr>
+          <td class="room-num">${r.number}</td>
+          <td><span class="room-status-badge ${r.status}">${statusLabel}</span></td>
+          <td style="font-weight:700;">${depositRentStr}</td>
+          <td>${tenantName}</td>
+          <td>${structureStr}</td>
+        </tr>
+      `;
+    });
+
+    const tableHtml = `
+      <div class="summary-table-wrapper">
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th>호실</th>
+              <th>상태</th>
+              <th>보증금/월세</th>
+              <th>세입자</th>
+              <th>구조/옵션</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${tableRows || '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">등록된 호실이 없습니다.</td></tr>'}
+          </tbody>
+        </table>
+      </div>
+    `;
+
+    card.innerHTML = headerHtml + tableHtml;
+    DOM.summaryDashboard.appendChild(card);
+  });
+
+  // 2. 공동 지출(세금) 카드 생성
+  const expCard = document.createElement('div');
+  expCard.className = 'summary-card card-expenses';
+  
+  const eugeneId = "b-1782310060216";
+  const eugeneList = exp[eugeneId] || [];
+  
+  const b2492Id = "b-1782310040299";
+  const b2492List = exp[b2492Id] || [];
+
+  let expListHtml = '';
+  
+  // 유진빌
+  expListHtml += `
+    <div style="font-weight:800; font-size:14px; margin-bottom:6px; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+      <i data-lucide="chevron-right" style="width:16px; height:16px; color:var(--primary);"></i> 유진빌 (2209번지)
+    </div>
+  `;
+  eugeneList.forEach(item => {
+    expListHtml += `
+      <div class="summary-expense-item">
+        <span class="expense-name">${item.name}</span>
+        <span class="expense-value">${item.value}</span>
+      </div>
+    `;
+  });
+  if (eugeneList.length === 0) {
+    expListHtml += `<p class="empty-text" style="padding: 4px 14px; font-size:12px; color:var(--text-muted);">등록된 지출 내역이 없습니다.</p>`;
+  }
+
+  // 2492번지
+  expListHtml += `
+    <div style="font-weight:800; font-size:14px; margin-top:12px; margin-bottom:6px; color:var(--text-main); display:flex; align-items:center; gap:6px;">
+      <i data-lucide="chevron-right" style="width:16px; height:16px; color:var(--primary);"></i> 2492번지
+    </div>
+  `;
+  b2492List.forEach(item => {
+    expListHtml += `
+      <div class="summary-expense-item">
+        <span class="expense-name">${item.name}</span>
+        <span class="expense-value">${item.value}</span>
+      </div>
+    `;
+  });
+  if (b2492List.length === 0) {
+    expListHtml += `<p class="empty-text" style="padding: 4px 14px; font-size:12px; color:var(--text-muted);">등록된 지출 내역이 없습니다.</p>`;
+  }
+
+  expCard.innerHTML = `
+    <div class="summary-card-header">
+      <h4 class="summary-card-title"><i data-lucide="receipt"></i> 공동 지출 및 세금</h4>
+      <button class="btn-edit-summary-extras" onclick="openEditExpensesModal()">
+        <i data-lucide="edit-3" style="width:12px; height:12px;"></i> 편집
+      </button>
+    </div>
+    <div class="summary-expense-list">
+      ${expListHtml}
+    </div>
+  `;
+  DOM.summaryDashboard.appendChild(expCard);
+
+  // 3. 추가 수익 카드 생성
+  const revCard = document.createElement('div');
+  revCard.className = 'summary-card card-revenue';
+  
+  let annualTotal = 0;
+  let revListHtml = '';
+  rev.forEach(item => {
+    const valNum = parseInt(item.value) || 0;
+    annualTotal += valNum;
+    revListHtml += `
+      <div class="carrier-item">
+        <span class="carrier-name" style="font-weight:700;">${item.name}</span>
+        <span class="carrier-value">${item.value}만원 / ${item.description || '년'}</span>
+      </div>
+    `;
+  });
+  if (rev.length === 0) {
+    revListHtml += `<p class="empty-text" style="padding: 4px 14px; font-size:12px; color:var(--text-muted);">등록된 추가 수익이 없습니다.</p>`;
+  }
+
+  const monthlyAvg = annualTotal > 0 ? (annualTotal / 12).toFixed(1) : 0;
+
+  revCard.innerHTML = `
+    <div class="summary-card-header">
+      <h4 class="summary-card-title"><i data-lucide="trending-up"></i> 추가 수익</h4>
+      <div class="summary-card-header-totals" style="gap: 8px;">
+        <span class="summary-total-badge" title="연 총합">
+          <i data-lucide="coins" style="width:12px; height:12px;"></i> 연 ${annualTotal} / 월평균 ${monthlyAvg}
+        </span>
+        <button class="btn-edit-summary-extras" onclick="openEditRevenueModal()">
+          <i data-lucide="edit-3" style="width:12px; height:12px;"></i> 편집
+        </button>
+      </div>
+    </div>
+    <div class="carrier-list">
+      ${revListHtml}
+    </div>
+    <span class="antenna-total-desc">
+      💡 추가 수익 연간 총 ${annualTotal}만원 (평균 월 ${monthlyAvg}만원 추가 수익 발생)
+    </span>
+  `;
+  DOM.summaryDashboard.appendChild(revCard);
+
+  lucide.createIcons();
+}
+
+// ----------------------------------------------------
+// 지출 및 추가 수익 동적 행 추가/삭제 헬퍼 함수
+// ----------------------------------------------------
+function createExpenseRow(name = '', value = '') {
+  const row = document.createElement('div');
+  row.className = 'dynamic-row';
+  row.innerHTML = `
+    <input type="text" placeholder="항목명 (예: 물세)" class="row-name" value="${name}" style="flex: 2;" required>
+    <input type="text" placeholder="설명/금액 (예: 10만원)" class="row-value" value="${value}" style="flex: 3;" required>
+    <button type="button" class="btn-row-del">&times;</button>
+  `;
+  
+  row.querySelector('.btn-row-del').addEventListener('click', () => {
+    row.remove();
+  });
+  return row;
+}
+
+function createRevenueRow(name = '', value = '', desc = '') {
+  const row = document.createElement('div');
+  row.className = 'dynamic-row';
+  row.innerHTML = `
+    <input type="text" placeholder="수익원 (예: LG U+)" class="row-name" value="${name}" style="flex: 2;" required>
+    <input type="number" placeholder="금액 (만원)" class="row-value" value="${value}" style="flex: 2;" required>
+    <input type="text" placeholder="주기/설명 (예: 년)" class="row-desc" value="${desc}" style="flex: 3;">
+    <button type="button" class="btn-row-del">&times;</button>
+  `;
+  
+  row.querySelector('.btn-row-del').addEventListener('click', () => {
+    row.remove();
+  });
+  return row;
+}
+
+// ----------------------------------------------------
+// 지출 및 추가 수익 편집 모달 제어 함수
+// ----------------------------------------------------
+function openEditExpensesModal() {
+  if (!DOM.expensesContainer2209 || !DOM.expensesContainer2492) return;
+  
+  DOM.expensesContainer2209.innerHTML = '';
+  DOM.expensesContainer2492.innerHTML = '';
+
+  const extras = state.summaryExtras || { expenses: {}, revenue: [] };
+  const exp = extras.expenses || {};
+
+  const eugeneList = exp["b-1782310060216"] || [];
+  const b2492List = exp["b-1782310040299"] || [];
+
+  // 유진빌 행 복원
+  eugeneList.forEach(item => {
+    DOM.expensesContainer2209.appendChild(createExpenseRow(item.name, item.value));
+  });
+
+  // 2492번지 행 복원
+  b2492List.forEach(item => {
+    DOM.expensesContainer2492.appendChild(createExpenseRow(item.name, item.value));
+  });
+
+  openModal('editExpensesModal');
+}
+
+function openEditRevenueModal() {
+  if (!DOM.revenueContainer) return;
+  DOM.revenueContainer.innerHTML = '';
+
+  const extras = state.summaryExtras || { expenses: {}, revenue: [] };
+  const rev = extras.revenue || [];
+
+  // 수익 항목 행 복원
+  rev.forEach(item => {
+    DOM.revenueContainer.appendChild(createRevenueRow(item.name, item.value, item.description));
+  });
+
+  openModal('editRevenueModal');
+}
+
+// ----------------------------------------------------
 // 초기화 및 실시간 폴링 동기화 작동
 // ----------------------------------------------------
 async function init() {
+  // 1. 지출 추가 버튼 연동
+  if (DOM.addExpBtn2209) {
+    DOM.addExpBtn2209.addEventListener('click', () => {
+      DOM.expensesContainer2209.appendChild(createExpenseRow());
+    });
+  }
+  if (DOM.addExpBtn2492) {
+    DOM.addExpBtn2492.addEventListener('click', () => {
+      DOM.expensesContainer2492.appendChild(createExpenseRow());
+    });
+  }
+
+  // 2. 추가수익 추가 버튼 연동
+  if (DOM.addRevBtn) {
+    DOM.addRevBtn.addEventListener('click', () => {
+      DOM.revenueContainer.appendChild(createRevenueRow());
+    });
+  }
+
+  // 3. 공동 지출 수정사항 저장 버튼
+  if (DOM.saveExpensesBtn) {
+    DOM.saveExpensesBtn.addEventListener('click', async () => {
+      const expenses2209 = [];
+      DOM.expensesContainer2209.querySelectorAll('.dynamic-row').forEach(row => {
+        const name = row.querySelector('.row-name').value.trim();
+        const val = row.querySelector('.row-value').value.trim();
+        if (name) expenses2209.push({ name, value: val });
+      });
+
+      const expenses2492 = [];
+      DOM.expensesContainer2492.querySelectorAll('.dynamic-row').forEach(row => {
+        const name = row.querySelector('.row-name').value.trim();
+        const val = row.querySelector('.row-value').value.trim();
+        if (name) expenses2492.push({ name, value: val });
+      });
+
+      const payload = {
+        expenses: {
+          "b-1782310060216": expenses2209,
+          "b-1782310040299": expenses2492
+        }
+      };
+
+      try {
+        const res = await fetch('/api/summary-extras', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        if (res.ok) {
+          closeModal('editExpensesModal');
+          await fetchBuildingsData(true);
+        } else {
+          alert('수정사항 저장에 실패했습니다.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('서버 통신 오류가 발생했습니다.');
+      }
+    });
+  }
+
+  // 4. 추가 수익 수정사항 저장 버튼
+  if (DOM.saveRevenueBtn) {
+    DOM.saveRevenueBtn.addEventListener('click', async () => {
+      const revItems = [];
+      DOM.revenueContainer.querySelectorAll('.dynamic-row').forEach(row => {
+        const name = row.querySelector('.row-name').value.trim();
+        const val = row.querySelector('.row-value').value.trim();
+        const desc = row.querySelector('.row-desc').value.trim();
+        if (name) revItems.push({ name, value: val, description: desc });
+      });
+
+      const payload = {
+        revenue: revItems
+      };
+
+      try {
+        const res = await fetch('/api/summary-extras', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        if (res.ok) {
+          closeModal('editRevenueModal');
+          await fetchBuildingsData(true);
+        } else {
+          alert('수정사항 저장에 실패했습니다.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('서버 통신 오류가 발생했습니다.');
+      }
+    });
+  }
+
   await fetchBuildingsData();
   
   // 이모지 제안 버튼 클릭 이벤트 바인딩

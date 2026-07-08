@@ -477,6 +477,31 @@ app.delete('/api/buildings/:buildingId/rooms/:roomId/ac-history/:historyId', asy
   res.json({ success: true, message: '설비 이력이 삭제되었습니다.' });
 });
 
+// 11. 요약 정보 지출/추가수익 데이터 조회
+app.get('/api/summary-extras', async (req, res) => {
+  const data = await readData();
+  res.json({
+    expenses: data.expenses || {},
+    revenue: data.revenue || []
+  });
+});
+
+// 12. 요약 정보 지출/추가수익 데이터 수정
+app.put('/api/summary-extras', async (req, res) => {
+  const { expenses, revenue } = req.body;
+  const data = await readData();
+  
+  if (expenses) data.expenses = expenses;
+  if (revenue) data.revenue = revenue;
+  
+  await writeData(data);
+  res.json({
+    success: true,
+    expenses: data.expenses || {},
+    revenue: data.revenue || []
+  });
+});
+
 // SPA 프론트엔드 라우트 (API 라우트 외 모든 요청은 index.html 서빙)
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));

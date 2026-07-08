@@ -2407,3 +2407,332 @@ body {
   }
 
 }
+
+/* ====================================================
+   요약 대시보드 (한페이지 정리) 스타일링
+   ==================================================== */
+.summary-dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 24px;
+  padding: 10px 0 30px;
+  width: 100%;
+}
+
+@media (max-width: 992px) {
+  .summary-dashboard {
+    grid-template-columns: 1fr;
+  }
+}
+
+.summary-card {
+  background: var(--bg-card);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  border-radius: var(--border-radius-md);
+  padding: 24px;
+  box-shadow: var(--shadow-md);
+  transition: var(--transition);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* 카드 상단 헤더 데코레이션 그라데이션 라인 */
+.summary-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary), #818cf8);
+}
+
+.summary-card.card-expenses::before {
+  background: linear-gradient(90deg, #f43f5e, #fda4af);
+}
+
+.summary-card.card-revenue::before {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+
+.summary-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f1f5f9;
+  padding-bottom: 12px;
+}
+
+.summary-card-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.summary-card-title i {
+  color: var(--primary);
+  width: 20px;
+  height: 20px;
+}
+
+.summary-card.card-expenses .summary-card-title i {
+  color: #f43f5e;
+}
+
+.summary-card.card-revenue .summary-card-title i {
+  color: #10b981;
+}
+
+.summary-card-header-totals {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.summary-total-badge {
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 12px;
+  font-weight: 800;
+  padding: 6px 12px;
+  border-radius: var(--border-radius-sm);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.summary-card.card-expenses .summary-total-badge {
+  background: var(--maintenance-light);
+  color: var(--maintenance);
+}
+
+.summary-card.card-revenue .summary-total-badge {
+  background: var(--occupied-light);
+  color: var(--occupied);
+}
+
+/* 룸 테이블 요약 */
+.summary-table-wrapper {
+  overflow-x: auto;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid #e2e8f0;
+}
+
+.summary-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 13px;
+}
+
+.summary-table th {
+  background: #f8fafc;
+  color: var(--text-muted);
+  font-weight: 700;
+  padding: 10px 12px;
+  border-bottom: 1px solid #e2e8f0;
+  white-space: nowrap;
+}
+
+.summary-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f1f5f9;
+  color: var(--text-main);
+}
+
+.summary-table tr:last-child td {
+  border-bottom: none;
+}
+
+.summary-table tr:hover {
+  background: #f8fafc;
+}
+
+.summary-table .room-num {
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.summary-table .room-status-badge {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.summary-table .room-status-badge.occupied {
+  background: var(--occupied-light);
+  color: var(--occupied);
+}
+
+.summary-table .room-status-badge.vacant {
+  background: var(--vacant-light);
+  color: var(--vacant);
+}
+
+/* 지출 리스트 */
+.summary-expense-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.summary-expense-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+  padding: 10px 14px;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid #e2e8f0;
+  transition: var(--transition);
+}
+
+.summary-expense-item:hover {
+  background: #f1f5f9;
+}
+
+.expense-left {
+  display: flex;
+  align-items: center;
+}
+
+.expense-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-main);
+}
+
+.expense-value {
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--text-main);
+  text-align: right;
+}
+
+/* 안테나 리스트 */
+.carrier-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.carrier-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 14px;
+  background: #f8fafc;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid #e2e8f0;
+  transition: var(--transition);
+}
+
+.carrier-item:hover {
+  background: #f1f5f9;
+}
+
+.carrier-left {
+  display: flex;
+  align-items: center;
+}
+
+.carrier-name {
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-main);
+}
+
+.carrier-value {
+  font-weight: 800;
+  font-size: 13px;
+  color: var(--text-main);
+}
+
+.antenna-total-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-align: right;
+  margin-top: 4px;
+  display: block;
+}
+
+/* 수정 버튼 */
+.btn-edit-summary-extras {
+  background: var(--bg-glass);
+  color: var(--primary);
+  border: 1px solid var(--primary-light);
+  border-radius: var(--border-radius-sm);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition);
+}
+
+.btn-edit-summary-extras:hover {
+  background: var(--primary);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+}
+
+/* 동적 추가/삭제 행 스타일 */
+.dynamic-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.dynamic-row input {
+  padding: 8px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: var(--border-radius-sm);
+  font-size: 13px;
+  background: var(--bg-card);
+  color: var(--text-main);
+  outline: none;
+  transition: var(--transition);
+}
+
+.dynamic-row input:focus {
+  border-color: var(--primary);
+}
+
+.btn-row-del {
+  background: #fee2e2;
+  color: #ef4444;
+  border: none;
+  border-radius: 4px;
+  width: 32px;
+  height: 32px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.btn-row-del:hover {
+  background: #fca5a5;
+  color: #b91c1c;
+}
+

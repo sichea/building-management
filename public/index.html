@@ -57,7 +57,11 @@
               <span class="stat-value" id="statVacant">0</span>
             </div>
             <div class="stat-icon-wrapper"><i data-lucide="door-open"></i></div>
-          </div>
+        </div>
+
+        <!-- 건물별 재정 현황판 -->
+        <div class="financial-stats-container" id="financialStatsContainer" style="display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap;">
+          <!-- JS에서 건물별 재정 요약 카드가 생성됩니다. -->
         </div>
 
       <!-- 3D 건물 뷰 -->
@@ -79,10 +83,15 @@
           </div>
         </div>
         
-        <div class="building-3d-wrapper">
+        <div class="building-3d-wrapper" id="building3DWrapper">
           <div class="building-3d" id="building3D">
             <!-- JS에서 층별로 동적 생성 -->
           </div>
+        </div>
+
+        <!-- 한페이지 정리 대시보드 -->
+        <div id="summaryDashboard" class="summary-dashboard" style="display: none;">
+          <!-- JS에서 동적으로 생성됩니다. -->
         </div>
       </section>
     </main>
@@ -362,6 +371,78 @@
       <div class="modal-footer">
         <button class="btn btn-secondary" id="modalCancelBtn">취소</button>
         <button class="btn btn-primary" id="modalSaveBtn">수정사항 저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 공동 지출 및 세금 편집 모달 -->
+  <div class="modal-overlay" id="editExpensesModal">
+    <div class="modal-container modal-large">
+      <div class="modal-header">
+        <h3>🧾 공동 지출 및 세금 관리</h3>
+        <button class="modal-close" onclick="closeModal('editExpensesModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <!-- 위쪽: 유진빌 지출 -->
+        <div class="modal-left-pane" style="margin-bottom: 24px;">
+          <section class="info-section">
+            <h3 class="pane-title" style="display: flex; justify-content: space-between; align-items: center;">
+              <span><i data-lucide="building"></i> 유진빌 (2209번지) 공동 지출</span>
+              <button type="button" class="btn btn-secondary btn-sm" id="addExpBtn2209" style="padding: 4px 8px; font-size: 12px; height: 26px;">
+                <i data-lucide="plus" style="width: 12px; height: 12px;"></i> 추가
+              </button>
+            </h3>
+            <div id="expensesContainer2209" style="margin-top: 12px;">
+              <!-- JS에서 동적 생성 -->
+            </div>
+          </section>
+        </div>
+        
+        <!-- 아래쪽: 2492번지 지출 -->
+        <div class="modal-right-pane">
+          <section class="info-section">
+            <h3 class="pane-title" style="display: flex; justify-content: space-between; align-items: center;">
+              <span><i data-lucide="building"></i> 2492번지 공동 지출</span>
+              <button type="button" class="btn btn-secondary btn-sm" id="addExpBtn2492" style="padding: 4px 8px; font-size: 12px; height: 26px;">
+                <i data-lucide="plus" style="width: 12px; height: 12px;"></i> 추가
+              </button>
+            </h3>
+            <div id="expensesContainer2492" style="margin-top: 12px;">
+              <!-- JS에서 동적 생성 -->
+            </div>
+          </section>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('editExpensesModal')">취소</button>
+        <button class="btn btn-primary" id="saveExpensesBtn">수정사항 저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 추가 수익 편집 모달 -->
+  <div class="modal-overlay" id="editRevenueModal">
+    <div class="modal-container modal-large">
+      <div class="modal-header">
+        <h3>💰 추가 수익 및 안테나 관리</h3>
+        <button class="modal-close" onclick="closeModal('editRevenueModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <section class="info-section">
+          <h3 class="pane-title" style="display: flex; justify-content: space-between; align-items: center;">
+            <span><i data-lucide="trending-up"></i> 추가 수익 항목</span>
+            <button type="button" class="btn btn-secondary btn-sm" id="addRevBtn" style="padding: 4px 8px; font-size: 12px; height: 26px;">
+              <i data-lucide="plus" style="width: 12px; height: 12px;"></i> 수익원 추가
+            </button>
+          </h3>
+          <div id="revenueContainer" style="margin-top: 12px;">
+            <!-- JS에서 동적 생성 -->
+          </div>
+        </section>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal('editRevenueModal')">취소</button>
+        <button class="btn btn-primary" id="saveRevenueBtn">수정사항 저장</button>
       </div>
     </div>
   </div>

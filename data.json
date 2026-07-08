@@ -66,7 +66,7 @@
           "status": "occupied",
           "leaseType": "wolse",
           "deposit": "200",
-          "rent": "",
+          "rent": "30",
           "structure": "🚪🚽❄️🧊🔥",
           "tenantName": "",
           "contact": "",
@@ -92,8 +92,8 @@
           "roomType": "tworoom",
           "status": "occupied",
           "leaseType": "wolse",
-          "deposit": "",
-          "rent": "",
+          "deposit": "500",
+          "rent": "40",
           "structure": "🚪🚽🔥",
           "tenantName": "전종일",
           "contact": "",
@@ -119,8 +119,8 @@
           "roomType": "tworoom",
           "status": "occupied",
           "leaseType": "wolse",
-          "deposit": "",
-          "rent": "",
+          "deposit": "500",
+          "rent": "50",
           "structure": "🚪🚽🔥",
           "tenantName": "",
           "contact": "",
@@ -181,7 +181,7 @@
           "status": "occupied",
           "leaseType": "wolse",
           "deposit": "200",
-          "rent": "",
+          "rent": "20",
           "structure": "🚪🚽❄️🧊🔥",
           "tenantName": "김정숙",
           "contact": "",
@@ -207,8 +207,8 @@
           "slotSize": 2,
           "status": "vacant",
           "leaseType": "wolse",
-          "deposit": "500",
-          "rent": "",
+          "deposit": "1000",
+          "rent": "45",
           "structure": "🚪🚪🚽❄️🔥",
           "tenantName": "",
           "contact": "",
@@ -235,7 +235,7 @@
           "status": "occupied",
           "leaseType": "wolse",
           "deposit": "200",
-          "rent": "",
+          "rent": "28",
           "structure": "🚪🚽❄️🧊🔥",
           "tenantName": "",
           "contact": "",
@@ -262,7 +262,7 @@
           "status": "occupied",
           "leaseType": "wolse",
           "deposit": "200",
-          "rent": "",
+          "rent": "29",
           "structure": "🚪🚽❄️🧊🔥",
           "tenantName": "",
           "contact": "",
@@ -288,8 +288,8 @@
           "slotSize": 5,
           "status": "occupied",
           "leaseType": "banjeonse",
-          "deposit": "",
-          "rent": "",
+          "deposit": "8000",
+          "rent": "25",
           "structure": "🚪🚪🚪🚽🚽",
           "tenantName": "최은실",
           "contact": "",
@@ -316,7 +316,7 @@
           "status": "occupied",
           "leaseType": "wolse",
           "deposit": "200",
-          "rent": "",
+          "rent": "20",
           "structure": "🚪🚽❄️🧊🔥",
           "tenantName": "찔리메이",
           "contact": "",
@@ -341,9 +341,9 @@
           "roomType": "tworoom",
           "slotSize": 2,
           "status": "occupied",
-          "leaseType": "jeonse",
+          "leaseType": "banjeonse",
           "deposit": "5000",
-          "rent": "",
+          "rent": "3",
           "structure": "🚪🚪🚽",
           "tenantName": "",
           "contact": "",
@@ -370,7 +370,7 @@
           "status": "occupied",
           "leaseType": "wolse",
           "deposit": "200",
-          "rent": "",
+          "rent": "30",
           "structure": "🚪🚽❄️🧊🔥⚡",
           "tenantName": "",
           "contact": "",
@@ -397,7 +397,7 @@
           "status": "occupied",
           "leaseType": "wolse",
           "deposit": "200",
-          "rent": "",
+          "rent": "24",
           "structure": "🚪🚽❄️🧊🔥",
           "tenantName": "",
           "contact": "",
@@ -416,6 +416,69 @@
           "notes": ""
         }
       ]
+    }
+  ],
+  "expenses": {
+    "b-1782310060216": [
+      {
+        "name": "물세",
+        "value": "17~24만원"
+      },
+      {
+        "name": "인터넷 + TV",
+        "value": "6만원 (6대)"
+      },
+      {
+        "name": "건물 청소비",
+        "value": "5만원"
+      },
+      {
+        "name": "보험비",
+        "value": "5만원"
+      }
+    ],
+    "b-1782310040299": [
+      {
+        "name": "물세",
+        "value": "10만원"
+      },
+      {
+        "name": "인터넷 + TV",
+        "value": "14,300 (201), 27,060 (3층)"
+      },
+      {
+        "name": "정수기",
+        "value": "2.5만원"
+      },
+      {
+        "name": "건물 청소비",
+        "value": "5만원"
+      },
+      {
+        "name": "보험비",
+        "value": "5만원"
+      },
+      {
+        "name": "청소도구",
+        "value": "1만원"
+      }
+    ]
+  },
+  "revenue": [
+    {
+      "name": "LG U+",
+      "value": "150",
+      "description": "년"
+    },
+    {
+      "name": "SKT",
+      "value": "160",
+      "description": "3년치 1번에 줌 (2028년 다시결정)"
+    },
+    {
+      "name": "KT",
+      "value": "120",
+      "description": "년"
     }
   ]
 }
