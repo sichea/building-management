@@ -171,12 +171,9 @@ async function fetchBuildingsData(silent = false) {
 // UI 렌더링 함수
 // ----------------------------------------------------
 
-// 건물 이름 표시 변환 헬퍼 (2209번지를 유진빌로 표시)
+// 건물 이름 표시 변환 헬퍼 (기본 건물명 반환)
 function getBuildingDisplayName(building) {
   if (!building) return '';
-  if (building.id === "b-1782310060216" || building.name === "2209번지" || building.name.includes("2209")) {
-    return "유진빌";
-  }
   return building.name;
 }
 
