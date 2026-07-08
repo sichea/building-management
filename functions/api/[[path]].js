@@ -535,6 +535,35 @@ export async function onRequest(context) {
       return jsonSuccess({ success: true, message: '설비 이력이 삭제되었습니다.' });
     }
 
+    // ----------------------------------------------------
+    // [GET] /api/summary-extras : 공동 지출 및 세금, 추가 수익 정보 조회
+    // ----------------------------------------------------
+    if (method === 'GET' && path === '/api/summary-extras') {
+      const data = await readData(env);
+      return jsonSuccess({
+        expenses: data.expenses || {},
+        revenue: data.revenue || []
+      });
+    }
+
+    // ----------------------------------------------------
+    // [PUT] /api/summary-extras : 공동 지출 및 세금, 추가 수익 정보 저장
+    // ----------------------------------------------------
+    if (method === 'PUT' && path === '/api/summary-extras') {
+      const body = await request.json();
+      const data = await readData(env);
+      
+      if (body.expenses !== undefined) {
+        data.expenses = body.expenses;
+      }
+      if (body.revenue !== undefined) {
+        data.revenue = body.revenue;
+      }
+
+      await writeData(env, data);
+      return jsonSuccess({ success: true });
+    }
+
     // 일치하는 API 엔드포인트가 없음
     return jsonError('경로를 찾을 수 없습니다.', 404);
 
