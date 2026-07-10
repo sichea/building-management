@@ -896,6 +896,15 @@ body {
   font-weight: 800;
 }
 
+/* 호실 상세 모달 타이틀(h2) 크기 고정 — 공동지출 타이틀과 동일 수준 */
+.room-title-area h2 {
+  font-size: 18px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .room-title-area {
   display: flex;
   align-items: center;
@@ -2477,6 +2486,7 @@ body {
   font-size: 18px;
   font-weight: 800;
   color: var(--text-main);
+  white-space: nowrap;
 }
 
 .summary-card-title i {
@@ -2497,6 +2507,8 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .summary-total-badge {

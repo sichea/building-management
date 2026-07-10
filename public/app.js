@@ -1583,3 +1583,66 @@ async function init() {
 
 // 페이지 로드 시 구동 시작
 document.addEventListener('DOMContentLoaded', init);
+
+// ----------------------------------------------------
+// 모바일 뒤로가기 버튼 처리 (Android PWA)
+// ----------------------------------------------------
+(function setupBackButtonHandler() {
+  // 앱 진입 시 history 스택에 더미 상태를 push하여 popstate가 발생하도록 함
+  history.pushState({ app: true }, '');
+
+  let backPressedOnce = false;
+  let backToastTimer = null;
+
+  // 토스트 메시지 엘리먼트 생성 (재사용)
+  const backToast = document.createElement('div');
+  backToast.id = 'backToast';
+  backToast.style.cssText = `
+    position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
+    background: rgba(30,30,30,0.88); color: #fff;
+    padding: 12px 24px; border-radius: 24px;
+    font-size: 15px; font-weight: 600; letter-spacing: -0.2px;
+    z-index: 99999; pointer-events: none;
+    opacity: 0; transition: opacity 0.25s;
+    white-space: nowrap;
+  `;
+  backToast.textContent = '앱을 종료하려면 뒤로가기 버튼을 한 번 더 누르세요';
+  document.body.appendChild(backToast);
+
+  function showBackToast() {
+    backToast.style.opacity = '1';
+    clearTimeout(backToastTimer);
+    backToastTimer = setTimeout(() => {
+      backToast.style.opacity = '0';
+      backPressedOnce = false;
+    }, 2000);
+  }
+
+  window.addEventListener('popstate', (e) => {
+    // 열려있는 모달이 있으면 모달 닫기
+    const activeModal = document.querySelector('.modal-overlay.active');
+    if (activeModal) {
+      closeModal(activeModal.id);
+      // history 스택 유지 (다시 push)
+      history.pushState({ app: true }, '');
+      return;
+    }
+
+    // 메인 화면에서 뒤로가기
+    history.pushState({ app: true }, ''); // 스택 재유지
+
+    if (backPressedOnce) {
+      // 두 번째 뒤로가기: 앱 종료
+      clearTimeout(backToastTimer);
+      backToast.style.opacity = '0';
+      // PWA/WebView에서 앱 종료 시도
+      history.go(-(history.length));
+      window.close();
+      return;
+    }
+
+    backPressedOnce = true;
+    showBackToast();
+  });
+})();
+
