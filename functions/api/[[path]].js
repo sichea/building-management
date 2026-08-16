@@ -32,6 +32,10 @@ function jsonSuccess(data, status = 200) {
 // Supabase REST API 통신 헬퍼 함수
 // ----------------------------------------------------
 async function readData(env) {
+  if (!env.SUPABASE_URL || !env.SUPABASE_KEY) {
+    throw new Error('Cloudflare 환경 변수(SUPABASE_URL 또는 SUPABASE_KEY)가 설정되지 않았습니다.');
+  }
+
   const url = `${env.SUPABASE_URL}/rest/v1/building_data?id=eq.1&select=data`;
   const res = await fetch(url, {
     method: 'GET',
@@ -42,7 +46,8 @@ async function readData(env) {
   });
 
   if (!res.ok) {
-    throw new Error(`Supabase 조회 실패: ${res.statusText}`);
+    const errorText = await res.text().catch(() => '');
+    throw new Error(`Supabase 조회 실패(${res.status}): ${res.statusText} ${errorText}`);
   }
 
   const result = await res.json();

@@ -136,7 +136,22 @@ function closeModal(modalId) {
 async function fetchBuildingsData(silent = false) {
   try {
     const res = await fetch('/api/buildings');
+    if (!res.ok) {
+      const errorData = await res.json().catch(() => ({}));
+      console.error('API 서버 응답 실패:', res.status, errorData);
+      showDbConnectionWarning(errorData.error || '데이터베이스 연결에 실패했습니다.');
+      return;
+    }
+    
     const buildings = await res.json();
+    if (!Array.isArray(buildings)) {
+      console.error('예상치 못한 데이터 형식:', buildings);
+      showDbConnectionWarning('데이터 형식이 올바르지 않습니다.');
+      return;
+    }
+
+    // 정상 수신 시 경고 배너 제거
+    hideDbConnectionWarning();
     state.buildings = buildings;
     
     // 추가 요약 정보 로드
@@ -164,6 +179,46 @@ async function fetchBuildingsData(silent = false) {
     }
   } catch (err) {
     console.error('데이터 호출 오류:', err);
+    showDbConnectionWarning(err.message || '네트워크 연결 오류');
+  }
+}
+
+// DB 연결 경고 배너 표시/숨김 헬퍼
+function showDbConnectionWarning(msg) {
+  let warningEl = document.getElementById('dbConnectionWarning');
+  if (!warningEl) {
+    warningEl = document.createElement('div');
+    warningEl.id = 'dbConnectionWarning';
+    warningEl.style.cssText = `
+      background: #fee2e2;
+      border: 1px solid #ef4444;
+      color: #b91c1c;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    `;
+    const container = document.querySelector('.app-container') || document.body;
+    container.insertBefore(warningEl, container.firstChild);
+  }
+  warningEl.innerHTML = `
+    <div style="display:flex; align-items:center; gap:8px;">
+      <span style="font-size:18px;">⚠️</span>
+      <span><strong>데이터베이스 연결 오류:</strong> ${msg} (Supabase 프로젝트가 일시정지(Paused) 상태인지 확인해주세요)</span>
+    </div>
+    <button onclick="fetchBuildingsData()" style="padding:4px 10px; background:#b91c1c; color:#fff; border:none; border-radius:4px; cursor:pointer; font-size:12px;">다시 시도</button>
+  `;
+  warningEl.style.display = 'flex';
+}
+
+function hideDbConnectionWarning() {
+  const warningEl = document.getElementById('dbConnectionWarning');
+  if (warningEl) {
+    warningEl.style.display = 'none';
   }
 }
 
