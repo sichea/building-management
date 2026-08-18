@@ -40,8 +40,8 @@ jobs:
             fi
           fi
 
-          # 2. SITE_URL이 등록되어 있거나 기본 주소로 배포된 Pages 사이트 핑
-          TARGET_URL="${SITE_URL:-https://building-management.pages.dev}"
+          # 2. 배포된 Cloudflare Pages 사이트 핑 (DB 조회 트리거)
+          TARGET_URL="${SITE_URL:-https://building-management-bp3.pages.dev}"
           echo "[2/2] 사이트 API 핑 전송 중: $TARGET_URL/api/buildings"
           
           SITE_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$TARGET_URL/api/buildings")
