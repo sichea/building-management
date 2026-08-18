@@ -1,0 +1,57 @@
+name: Supabase & Site Keep-Alive
+
+on:
+  schedule:
+    # 3일마다 한국 시간 오전 9시 (UTC 00:00)에 자동 실행
+    - cron: '0 0 */3 * *'
+  # GitHub 웹 화면의 Actions 탭에서 수동으로 'Run workflow' 실행도 가능
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase & Site
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+          SITE_URL: ${{ secrets.SITE_URL }}
+        run: |
+          echo "=================================================="
+          echo "Starting Keep-Alive Ping..."
+          echo "=================================================="
+
+          SUCCESS=0
+
+          # 1. GitHub Secrets에 SUPABASE_URL & KEY가 등록되어 있을 경우 직접 DB 핑
+          if [ -n "$SUPABASE_URL" ] && [ -n "$SUPABASE_KEY" ]; then
+            echo "[1/2] Supabase REST API 직접 핑 전송 중..."
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              -H "apikey: $SUPABASE_KEY" \
+              -H "Authorization: Bearer $SUPABASE_KEY" \
+              "$SUPABASE_URL/rest/v1/building_data?id=eq.1&select=id")
+            
+            echo "Supabase 응답 코드: $HTTP_STATUS"
+            if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 206 ]; then
+              echo "✅ Supabase DB 활동 상태 유지 성공!"
+              SUCCESS=1
+            else
+              echo "⚠️ Supabase 응답 상태 코드 확인 필요: $HTTP_STATUS"
+            fi
+          fi
+
+          # 2. SITE_URL이 등록되어 있거나 기본 주소로 배포된 Pages 사이트 핑
+          TARGET_URL="${SITE_URL:-https://building-management.pages.dev}"
+          echo "[2/2] 사이트 API 핑 전송 중: $TARGET_URL/api/buildings"
+          
+          SITE_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$TARGET_URL/api/buildings")
+          echo "사이트 API 응답 코드: $SITE_STATUS"
+
+          if [ "$SITE_STATUS" -eq 200 ]; then
+            echo "✅ 사이트 및 Supabase 연동 정상 확인 완료!"
+            SUCCESS=1
+          fi
+
+          echo "=================================================="
+          echo "Keep-Alive 완료!"
+          echo "=================================================="
